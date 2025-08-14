@@ -14,7 +14,8 @@
     <arg name="vehicle" default="iris"/>
     <!-- <arg name="world" default="$(find mavlink_sitl_gazebo)/worlds/empty.world"/> -->
     <arg name="world" default="$(find mavlink_sitl_gazebo)/worlds/imav_indoor.world"/>
-    <arg name="sdf" default="$(find mavlink_sitl_gazebo)/models/$(arg vehicle)/$(arg vehicle).sdf"/>
+    <!-- <arg name="sdf" default="$(find mavlink_sitl_gazebo)/models/$(arg vehicle)/$(arg vehicle).sdf"/> -->
+    <arg name="sdf" default="$(find mavlink_sitl_gazebo)/models/$(arg vehicle)_mid360_D435i/$(arg vehicle)_mid360_D435i.sdf"/>
 
     <!-- gazebo configs -->
     <arg name="gui" default="true"/>
