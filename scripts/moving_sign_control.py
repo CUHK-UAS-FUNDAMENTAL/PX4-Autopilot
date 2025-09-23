@@ -1,46 +1,59 @@
-#!/usr/bin/env python
 import rospy
-from gazebo_msgs.msg import ModelState
-from gazebo_msgs.srv import SetModelState
-import math
+from gazebo_msgs.srv import SetLinkState
+from gazebo_msgs.msg import LinkState
 import time
+from gazebo_msgs.msg import ModelStates
+
+
+def model_state_callback(msg):
+    model_name = "landing-sign-moving"
+    if model_name in msg.name:
+        idx = msg.name.index(model_name)
+        position = msg.pose[idx].position
+        velocity = msg.twist[idx].linear
+        rospy.loginfo("Position: x=%.2f, y=%.2f, z=%.2f | Velocity: x=%.2f, y=%.2f, z=%.2f",
+                      position.x, position.y, position.z,
+                      velocity.x, velocity.y, velocity.z)
 
 def main():
-    # 初始化 ROS 节点
-    rospy.init_node("moving_landing_sign_node")
-    
-    # 等待 Gazebo 的 set_model_state 服务启动
-    rospy.wait_for_service('/gazebo/set_model_state')
-    set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
+    rospy.init_node("moving_landing_sign_velocity_node")
+    rospy.wait_for_service('/gazebo/set_link_state')
+    set_link_state = rospy.ServiceProxy('/gazebo/set_link_state', SetLinkState)
 
-    # 模型参数
-    model_name = "landing-sign-moving"   # SDF 中 model name
-    start_x = 3.0    #起始位置
-    amplitude = 1.0               # 左右移动幅度
-    speed = 0.5                   # 最大速度 m/s
-    z_height = 0.5                # 平台高度（根据 SDF 设置）
 
-    rate = rospy.Rate(100)        # 100Hz
-    t0 = time.time()
+    rospy.Subscriber("/gazebo/model_states", ModelStates, model_state_callback)
+
+    link_name = "landing-sign-moving::link"  # 根据实际模型修改
+    x = 3.0
+    vx = 0.5
+    y = -3.5
+    z = 0.0
+
+    rate = rospy.Rate(100)
+    dt = 0.01  # 与rate一致
 
     while not rospy.is_shutdown():
-        t = time.time() - t0
-        # 正弦函数生成周期性位置
-        x = start_x + amplitude * math.sin(speed * t * math.pi / amplitude)
+        # 更新位置
+        x += vx * dt
+        # 边界判断
+        if x >= 4.0:
+            x = 4.0
+            vx = -abs(vx)
+        elif x <= 2.0:
+            x = 2.0
+            vx = abs(vx)
 
-        # 构建 ModelState 消息
-        state = ModelState()
-        state.model_name = model_name
-        state.pose.position.x = x
-        state.pose.position.y = -3.5
-        state.pose.position.z = z_height
-        state.pose.orientation.x = 0
-        state.pose.orientation.y = 0
-        state.pose.orientation.z = 1
-        state.pose.orientation.w = 1
+        link_state = LinkState()
+        link_state.link_name = link_name
+        link_state.pose.position.x = x
+        link_state.pose.position.y = y
+        link_state.pose.position.z = z
+        link_state.twist.linear.x = vx
+        link_state.twist.linear.y = 0
+        link_state.twist.linear.z = 0
 
         try:
-            set_state(state)   # 调用服务更新模型位置
+            set_link_state(link_state)
         except rospy.ServiceException as e:
             rospy.logerr("Service call failed: %s" % e)
 
