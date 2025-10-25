@@ -25,6 +25,8 @@ def main():
 
     link_name = "landing-sign-moving::link"  # 根据实际模型修改
     x = 3.0
+    x_0 = x
+    length = 1.0 # 单边移动行程
     vx = 0.5
     y = -3.5
     z = 0.0
@@ -36,11 +38,11 @@ def main():
         # 更新位置
         x += vx * dt
         # 边界判断
-        if x >= 4.0:
-            x = 4.0
+        if x >= x_0 + length:
+            x = x_0 + length
             vx = -abs(vx)
-        elif x <= 2.0:
-            x = 2.0
+        elif x <= x_0 - length:
+            x = x_0 - length
             vx = abs(vx)
 
         link_state = LinkState()
