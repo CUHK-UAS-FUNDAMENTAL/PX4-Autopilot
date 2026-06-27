@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# @name Gazebo px4multi
+#
+# @type Quadrotor
+#
+
+PX4_SIM_MODEL=${PX4_SIM_MODEL:=px4multi}
+
+. ${R}etc/init.d-posix/airframes/4006_gz_px4vision
