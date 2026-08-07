@@ -5,8 +5,7 @@
     <!-- vehicle pose -->
     <arg name="x" default="-2.2"/>
     <arg name="y" default="-6.993107"/>
-    <!-- <arg name="x" default="-3"/> -->
-    <!-- <arg name="y" default="-4"/> -->
+    <!-- <arg name="y" default="4.993107"/> -->
     <arg name="z" default="0.3"/>
     <arg name="R" default="0"/>
     <arg name="P" default="0"/>
@@ -63,5 +62,6 @@
 
     <node pkg="tf" type="static_transform_publisher" name="world_to_map" args="0 0 0 0 0 0 camera_init map 1000"/>
     <node pkg="tf" type="static_transform_publisher" name="world_to_world" args="0 0 0 0 0 0 camera_init world 1000"/>
+    <node pkg="tf" type="static_transform_publisher" name="baselink_to_camera" args="0.108 0 -0.01 0 1.5708 0 base_link camera_link 1000"/>
 
 </launch>
